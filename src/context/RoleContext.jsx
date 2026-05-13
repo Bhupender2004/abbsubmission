@@ -13,24 +13,31 @@ export const ROLE_THEMES = {
     accent: '#22C55E', // Healthy green
     accentSoft: 'rgba(34, 197, 94, 0.1)',
     label: 'Operations Mode',
-    description: 'Real-time monitoring and alarm response focus.'
+    description: 'Real-time monitoring and alarm response focus.',
+    permissions: ['view_alarms', 'ack_alarms', 'view_telemetry']
   },
   [ROLES.ENGINEER]: {
     accent: '#3B82F6', // Selected blue
     accentSoft: 'rgba(59, 130, 246, 0.1)',
     label: 'Engineering Mode',
-    description: 'Performance optimization and technical analysis focus.'
+    description: 'Performance optimization and technical analysis focus.',
+    permissions: ['view_telemetry', 'view_logs', 'calibrate_sensors', 'edit_config']
   },
   [ROLES.MANAGER]: {
     accent: '#A855F7', // Purple
     accentSoft: 'rgba(168, 85, 247, 0.1)',
     label: 'Management Mode',
-    description: 'Key performance indicators and resource overview focus.'
+    description: 'Key performance indicators and resource overview focus.',
+    permissions: ['view_kpis', 'view_reports', 'manage_users']
   },
 };
 
 export function RoleProvider({ children }) {
   const [role, setRole] = useState(ROLES.OPERATOR);
+
+  const hasPermission = (permission) => {
+    return ROLE_THEMES[role].permissions.includes(permission);
+  };
 
   // Update CSS variables when role changes
   useEffect(() => {
@@ -40,7 +47,12 @@ export function RoleProvider({ children }) {
   }, [role]);
 
   return (
-    <RoleContext.Provider value={{ role, setRole, theme: ROLE_THEMES[role] }}>
+    <RoleContext.Provider value={{ 
+      role, 
+      setRole, 
+      theme: ROLE_THEMES[role],
+      hasPermission 
+    }}>
       {children}
     </RoleContext.Provider>
   );
