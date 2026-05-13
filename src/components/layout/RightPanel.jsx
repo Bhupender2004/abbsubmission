@@ -250,15 +250,34 @@ function MachineDetail({ machine, alarms }) {
         </div>
       )}
 
-      {/* Nominal state (footer) */}
-      {!hasAlarms && role === ROLES.OPERATOR && (
-        <div className="p-5 border-t border-border mt-auto">
+      {/* RBAC Protected Actions */}
+      <div className="p-5 border-t border-border mt-auto">
+        {role === ROLES.OPERATOR && !hasAlarms && (
           <div className="flex items-center justify-center text-center py-4 bg-status-healthy/5 rounded-lg border border-status-healthy/20">
             <CheckCircle2 className="w-4 h-4 text-status-healthy mr-2" />
             <p className="text-[10px] text-text-secondary">System nominal.</p>
           </div>
-        </div>
-      )}
+        )}
+        
+        {role === ROLES.ENGINEER && (
+          <div className="grid grid-cols-2 gap-2">
+            <button className="flex items-center justify-center py-2 bg-border/40 border border-border text-[10px] text-text-primary rounded font-medium hover:bg-border/60 transition-colors">
+              <Wrench className="w-3 h-3 mr-1.5" />
+              CALIBRATE
+            </button>
+            <button className="flex items-center justify-center py-2 bg-border/40 border border-border text-[10px] text-text-primary rounded font-medium hover:bg-border/60 transition-colors">
+              <Settings className="w-3 h-3 mr-1.5" />
+              OVERRIDE
+            </button>
+          </div>
+        )}
+
+        {role === ROLES.MANAGER && (
+          <button className="w-full py-2 bg-role-accent/10 border border-role-accent/20 text-[10px] text-role-accent rounded font-bold hover:bg-role-accent/20 transition-colors">
+            GENERATE SHIFT REPORT
+          </button>
+        )}
+      </div>
     </motion.div>
   );
 }
