@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-text-primary font-sans antialiased overflow-hidden;
+  }
+}
+
+/* Hide scrollbar for a cleaner UI */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-text-secondary;
+}
+
+/* React Flow custom styles */
+.react-flow__pane {
+  background-color: transparent !important;
+}
+.react-flow__controls button {
+  background-color: #171B22 !important;
+  border-bottom: 1px solid #262C36 !important;
+  fill: #F5F7FA !important;
+}
+.react-flow__controls button:hover {
+  background-color: #262C36 !important;
+}
