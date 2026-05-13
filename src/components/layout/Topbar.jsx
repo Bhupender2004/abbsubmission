@@ -1,10 +1,12 @@
 import { Search, Bell, Clock, UserCircle, ShieldAlert } from 'lucide-react';
 import { useAlarmContext } from '../../context/AlarmContext';
+import { useRole, ROLES } from '../../context/RoleContext';
 import { Badge } from '../ui/Badge';
 import { useEffect, useState } from 'react';
 
 export function Topbar() {
   const { activeAlarmsCount, criticalCount, warningCount } = useAlarmContext();
+  const { role, setRole, theme } = useRole();
   const [time, setTime] = useState(new Date().toLocaleTimeString());
 
   useEffect(() => {
@@ -74,16 +76,41 @@ export function Topbar() {
           )}
         </div>
 
-        {/* Operator */}
+        {/* Role Persona Switcher */}
         <div className="flex items-center space-x-3 border-l border-border pl-5">
-          <div className="text-right">
-            <div className="text-xs font-medium text-text-primary">Operator 04</div>
-            <div className="text-[10px] text-text-secondary flex items-center justify-end">
-              <span className="w-1.5 h-1.5 rounded-full bg-status-healthy mr-1" />
-              Control Room
+          <div className="flex flex-col items-end">
+            <div className="relative group">
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="bg-card border border-border text-xs text-text-primary rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[var(--role-accent)] appearance-none pr-6 cursor-pointer hover:bg-border/20 transition-colors"
+                style={{ borderColor: 'var(--role-accent)' }}
+              >
+                {Object.values(ROLES).map((r) => (
+                  <option key={r} value={r} className="bg-card text-text-primary">
+                    {r}
+                  </option>
+                ))}
+              </select>
+              <div 
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] pointer-events-none"
+                style={{ borderTopColor: 'var(--role-accent)' }}
+              />
+            </div>
+            <div className="text-[10px] text-text-secondary mt-1 flex items-center">
+              <span 
+                className="w-1.5 h-1.5 rounded-full mr-1.5 animate-pulse" 
+                style={{ backgroundColor: 'var(--role-accent)' }}
+              />
+              {theme.label}
             </div>
           </div>
-          <UserCircle className="w-7 h-7 text-text-secondary" />
+          <div 
+            className="w-8 h-8 rounded-full flex items-center justify-center border transition-colors"
+            style={{ borderColor: 'var(--role-accent)', backgroundColor: 'var(--role-accent-soft)' }}
+          >
+            <UserCircle className="w-5 h-5 text-text-primary" style={{ color: 'var(--role-accent)' }} />
+          </div>
         </div>
       </div>
     </header>
