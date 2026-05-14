@@ -3,34 +3,36 @@
 import { useState } from "react";
 import "./PlantSVGMap.css";
 
-// ── MOCK DATA (temporary — replace with import from mockData.js in Step 6) ──
-const sensors = [
-  {
-    id: "S1", x: 130, y: 100,
-    label: "Pump A", zone: "Zone A", severity: "critical",
-    detail: "Pressure overload: 142 PSI. Limit is 120 PSI."
-  },
-  {
-    id: "S2", x: 250, y: 100,
-    label: "Valve B", zone: "Zone A", severity: "warning",
-    detail: "Flow rate reduced to 34 L/min. Normal is 60 L/min."
-  },
-  {
-    id: "S3", x: 130, y: 230,
-    label: "Tank C", zone: "Zone B", severity: "normal",
-    detail: "Level at 78%. All parameters within range."
-  },
-  {
-    id: "S4", x: 250, y: 230,
-    label: "Motor D", zone: "Zone B", severity: "critical",
-    detail: "Overheating detected: 94°C. Limit is 80°C."
-  },
-  {
-    id: "S5", x: 190, y: 165,
-    label: "Sensor E", zone: "Center", severity: "warning",
-    detail: "Vibration above threshold. Bearing check recommended."
-  }
-];
+import { plantHierarchy, initialAlarms } from "../data/mockData";
+
+// Build flat sensor list from plantHierarchy + pull severity from initialAlarms
+const positionMap = {
+  pump_1:   { x: 130, y: 100 },
+  valve_1:  { x: 250, y: 100 },
+  chiller_1:{ x: 130, y: 230 },
+  pump_2:   { x: 250, y: 230 },
+  comp_1:   { x: 190, y: 165 },
+};
+
+const sensors = plantHierarchy.zones
+  .flatMap(zone =>
+    zone.machines
+      .filter(m => positionMap[m.id])          // only machines you've placed on the map
+      .map(m => {
+        const alarm = initialAlarms.find(a => a.machineId === m.id);
+        return {
+          id:       m.id,
+          label:    m.name,
+          zone:     zone.name,
+          x:        positionMap[m.id].x,
+          y:        positionMap[m.id].y,
+          severity: m.status === "critical" ? "critical"
+                  : m.status === "warning"  ? "warning"
+                  : "normal",
+          detail:   alarm ? alarm.summary : "All parameters normal.",
+        };
+      })
+  );
 
 // ── LOOKUP MAPS ──
 const colorMap = {
