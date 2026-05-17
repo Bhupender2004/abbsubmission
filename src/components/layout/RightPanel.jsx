@@ -1,5 +1,8 @@
 import { useAlarmContext } from '../../context/AlarmContext';
 import { useRole, ROLES } from '../../context/RoleContext';
+import { useState } from 'react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import {
   Activity,
   Thermometer,
@@ -12,6 +15,8 @@ import {
   Wrench,
   Radio,
   Settings,
+  Download,
+  Loader2
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -60,12 +65,145 @@ function EmptyState() {
 
 function MachineDetail({ machine, alarms }) {
   const { role } = useRole();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [calState, setCalState] = useState('idle');
+  const [ovrState, setOvrState] = useState('idle');
+
   const machineAlarms = alarms.filter((a) => a.machineId === machine.id && a.status === 'active');
   const hasAlarms = machineAlarms.length > 0;
   const statusVariant = machine.status === 'critical' ? 'critical' : machine.status === 'warning' ? 'warning' : 'healthy';
 
+  const handleGenerateReport = async () => {
+    setIsGenerating(true);
+    
+    // Simulate a brief generation delay for UX
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    try {
+      // Robustly resolve the jsPDF constructor to fix Vite ESM/CJS import issues
+      const jsPDFConstructor = window.jspdf?.jsPDF || (typeof jsPDF !== 'undefined' ? jsPDF : null);
+      
+      if (!jsPDFConstructor) {
+        // Fallback: If jsPDF fails to load due to Vite cache, we dynamically import it
+        const module = await import('jspdf');
+        var DocClass = module.jsPDF || module.default;
+      } else {
+        var DocClass = jsPDFConstructor;
+      }
+
+      const doc = new DocClass({ orientation: 'p', unit: 'mm', format: 'a4' });
+      
+      // Draw White Background
+      doc.setFillColor(255, 255, 255);
+      doc.rect(0, 0, 210, 297, 'F');
+      
+      // Header
+      doc.setTextColor(20, 20, 20); // Dark text for title
+      doc.setFontSize(24);
+      doc.text('Shift Performance Report', 20, 30);
+      
+      doc.setFontSize(11);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Generated on: ${new Date().toLocaleString()}`, 20, 42);
+      
+      // Asset Context box
+      doc.setDrawColor(220, 220, 225);
+      doc.setFillColor(248, 248, 250);
+      doc.rect(20, 50, 170, 35, 'FD');
+      
+      doc.setFontSize(14);
+      doc.setTextColor(30, 30, 30);
+      doc.text((machine.name || 'Unknown Asset').toUpperCase(), 25, 62);
+      
+      doc.setFontSize(10);
+      doc.setTextColor(80, 80, 80);
+      doc.text(`Asset ID: ${(machine.id || 'N/A').toUpperCase()}`, 25, 72);
+      doc.text(`Zone: ${machine.zoneName || 'Unknown'}`, 80, 72);
+      doc.text(`Status: ${(machine.status || 'unknown').toUpperCase()}`, 140, 72);
+      
+      // Productivity Metrics Box
+      doc.setDrawColor(220, 220, 225);
+      doc.setFillColor(248, 248, 250);
+      doc.rect(20, 95, 170, 50, 'FD');
+      
+      doc.setFontSize(12);
+      doc.setTextColor(30, 30, 30);
+      doc.text('Productivity Overview', 25, 105);
+      
+      doc.setFontSize(11);
+      doc.setTextColor(80, 80, 80);
+      doc.text('OEE Index:', 25, 118);
+      doc.setTextColor(107, 33, 168); // Darker purple for white background readability
+      doc.setFontSize(14);
+      doc.text('84.2%', 55, 118);
+      
+      doc.setFontSize(11);
+      doc.setTextColor(80, 80, 80);
+      doc.text('Availability:', 100, 118);
+      doc.setTextColor(30, 30, 30);
+      doc.text('98.4%', 130, 118);
+      
+      doc.setTextColor(80, 80, 80);
+      doc.text('Quality Rate:', 25, 132);
+      doc.setTextColor(30, 30, 30);
+      doc.text('99.1%', 55, 132);
+      
+      // Resource Allocation Box
+      doc.setDrawColor(220, 220, 225);
+      doc.setFillColor(248, 248, 250);
+      doc.rect(20, 155, 170, 45, 'FD');
+      
+      doc.setFontSize(12);
+      doc.setTextColor(30, 30, 30);
+      doc.text('Resource Allocation', 25, 165);
+      
+      doc.setFontSize(11);
+      doc.setTextColor(80, 80, 80);
+      doc.text('Energy Consumption:', 25, 178);
+      doc.setTextColor(30, 30, 30);
+      doc.text('42 kWh', 75, 178);
+      
+      doc.setTextColor(80, 80, 80);
+      doc.text('Operator Utilization:', 25, 190);
+      doc.setTextColor(30, 30, 30);
+      doc.text('92%', 75, 190);
+      
+      // Footer
+      doc.setFontSize(9);
+      doc.setTextColor(150, 150, 150);
+      doc.text('ABB Next-Gen Industrial HMI System  •  CONFIDENTIAL', 20, 280);
+      
+      // Trigger instant download
+      doc.save(`Shift_Report_${(machine.name || 'Asset').replace(/\s+/g, '_')}.pdf`);
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      alert('An error occurred while generating the PDF. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCalibrate = () => {
+    if (calState !== 'idle') return;
+    setCalState('active');
+    setTimeout(() => {
+      setCalState('success');
+      setTimeout(() => setCalState('idle'), 2000);
+    }, 2000);
+  };
+
+  const handleOverride = () => {
+    if (ovrState !== 'idle') return;
+    setOvrState('active');
+    setTimeout(() => {
+      setOvrState('success');
+      setTimeout(() => setOvrState('idle'), 2000);
+    }, 2000);
+  };
+
   return (
     <motion.div
+      id="shift-report-panel"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
@@ -262,20 +400,42 @@ function MachineDetail({ machine, alarms }) {
         
         {role === ROLES.ENGINEER && (
           <div className="grid grid-cols-2 gap-2">
-            <button className="flex items-center justify-center py-2 bg-border/40 border border-border text-[10px] text-text-primary rounded font-medium hover:bg-border/60 transition-colors">
-              <Wrench className="w-3 h-3 mr-1.5" />
-              CALIBRATE
+            <button 
+              onClick={handleCalibrate}
+              disabled={calState !== 'idle'}
+              className={`flex items-center justify-center py-2 border text-[10px] rounded font-medium transition-colors disabled:opacity-80
+                ${calState === 'success' ? 'bg-status-healthy/20 border-status-healthy/40 text-status-healthy' : 'bg-border/40 border-border text-text-primary hover:bg-border/60'}`}
+            >
+              {calState === 'active' ? (
+                <><Loader2 className="w-3 h-3 mr-1.5 animate-spin text-[var(--role-accent)]" /> CALIBRATING...</>
+              ) : calState === 'success' ? (
+                <><CheckCircle2 className="w-3 h-3 mr-1.5" /> CALIBRATED</>
+              ) : (
+                <><Wrench className="w-3 h-3 mr-1.5" /> CALIBRATE</>
+              )}
             </button>
-            <button className="flex items-center justify-center py-2 bg-border/40 border border-border text-[10px] text-text-primary rounded font-medium hover:bg-border/60 transition-colors">
-              <Settings className="w-3 h-3 mr-1.5" />
-              OVERRIDE
+            <button 
+              onClick={handleOverride}
+              disabled={ovrState !== 'idle'}
+              className={`flex items-center justify-center py-2 border text-[10px] rounded font-medium transition-colors disabled:opacity-80
+                ${ovrState === 'success' ? 'bg-status-warning/20 border-status-warning/40 text-status-warning' : 'bg-border/40 border-border text-text-primary hover:bg-border/60'}`}
+            >
+              {ovrState === 'active' ? (
+                <><Loader2 className="w-3 h-3 mr-1.5 animate-spin text-status-warning" /> OVERRIDING...</>
+              ) : ovrState === 'success' ? (
+                <><CheckCircle2 className="w-3 h-3 mr-1.5" /> OVERRIDDEN</>
+              ) : (
+                <><Settings className="w-3 h-3 mr-1.5" /> OVERRIDE</>
+              )}
             </button>
           </div>
         )}
 
         {role === ROLES.MANAGER && (
           <button 
-            className="w-full py-2 text-[10px] rounded font-bold transition-colors"
+            onClick={handleGenerateReport}
+            disabled={isGenerating}
+            className="w-full flex items-center justify-center py-2 text-[10px] rounded font-bold transition-colors disabled:opacity-50"
             style={{ 
               backgroundColor: 'var(--role-accent-soft)', 
               borderWidth: '1px',
@@ -283,7 +443,17 @@ function MachineDetail({ machine, alarms }) {
               color: 'var(--role-accent)'
             }}
           >
-            GENERATE SHIFT REPORT
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                GENERATING...
+              </>
+            ) : (
+              <>
+                <Download className="w-3 h-3 mr-2" />
+                GENERATE SHIFT REPORT
+              </>
+            )}
           </button>
         )}
       </div>
