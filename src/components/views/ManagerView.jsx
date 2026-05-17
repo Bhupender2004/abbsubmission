@@ -2,6 +2,19 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Users, Clock, Zap, Target, BarChart3 } from 'lucide-react';
 
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+
+const throughputData = [
+  { time: '0:00', value: 45 },
+  { time: '1:00', value: 62 },
+  { time: '2:00', value: 58 },
+  { time: '3:00', value: 75 },
+  { time: '4:00', value: 90 },
+  { time: '5:00', value: 82 },
+  { time: '6:00', value: 88 },
+  { time: '7:00', value: 95 },
+];
+
 export function ManagerView() {
   return (
     <main className="flex-1 bg-background-secondary p-8 overflow-y-auto">
@@ -20,7 +33,7 @@ export function ManagerView() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Production Chart Placeholder */}
+          {/* Production Chart */}
           <div className="lg:col-span-2 bg-card border border-border rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-sm font-bold text-text-primary flex items-center">
@@ -32,18 +45,50 @@ export function ManagerView() {
                 <option>Last 24 Hours</option>
               </select>
             </div>
-            <div className="h-64 flex items-end justify-between px-4">
-              {[45, 62, 58, 75, 90, 82, 88, 95].map((h, i) => (
-                <div key={i} className="flex flex-col items-center w-8">
-                  <motion.div 
-                    initial={{ height: 0 }}
-                    animate={{ height: `${h}%` }}
-                    className="w-full rounded-t-sm"
-                    style={{ backgroundColor: 'color-mix(in srgb, var(--role-accent) 40%, transparent)' }}
+            <div className="h-64 w-full mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={throughputData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--role-accent, #a855f7)" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="var(--role-accent, #a855f7)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} opacity={0.5} />
+                  <XAxis 
+                    dataKey="time" 
+                    stroke="#9ca3af" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false} 
+                    dy={10}
                   />
-                  <span className="text-[10px] text-text-secondary mt-2">{0+i}:00</span>
-                </div>
-              ))}
+                  <YAxis 
+                    stroke="#9ca3af" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false} 
+                    dx={-10}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#18181b', 
+                      border: '1px solid #27272a',
+                      borderRadius: '8px',
+                      color: '#f4f4f5'
+                    }} 
+                    itemStyle={{ color: 'var(--role-accent, #a855f7)' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="var(--role-accent, #a855f7)" 
+                    strokeWidth={2}
+                    fillOpacity={1} 
+                    fill="url(#colorValue)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
