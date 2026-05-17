@@ -3,11 +3,13 @@
 // =============================================================================
 // Manages: alarms, selectedMachine, acknowledged/escalated state, active role
 // Functions: acknowledgeAlarm, escalateAlarm, selectMachine, getAlarmsForMachine
+// Now includes: alarm sound integration via useAlarmSound hook
 // All features stay synchronized through this single context.
 // =============================================================================
 
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import { initialAlarms, plantHierarchy, aiGlobalSummary } from '../data/mockData';
+import { useAlarmSound } from '../hooks/useAlarmSound';
 
 const AlarmContext = createContext(null);
 
@@ -98,6 +100,9 @@ export function AlarmProvider({ children }) {
     [alarms]
   );
 
+  // ── Alarm Sound Integration ──────────────────────────────────────────────
+  const alarmSound = useAlarmSound(activeAlarms);
+
   // ── Context value ────────────────────────────────────────────────────────
 
   const value = useMemo(
@@ -121,6 +126,8 @@ export function AlarmProvider({ children }) {
       escalateAlarm,
       selectMachine,
       getAlarmsForMachine,
+      // Sound
+      alarmSound,
     }),
     [
       alarms,
@@ -138,6 +145,7 @@ export function AlarmProvider({ children }) {
       escalateAlarm,
       selectMachine,
       getAlarmsForMachine,
+      alarmSound,
     ]
   );
 
