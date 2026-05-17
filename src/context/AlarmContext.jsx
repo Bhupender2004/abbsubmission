@@ -43,7 +43,11 @@ export function AlarmProvider({ children }) {
   // ── Machine selection ────────────────────────────────────────────────────
 
   const selectMachine = useCallback((machineId) => {
-    setSelectedMachineId((prev) => (prev === machineId ? null : machineId));
+    if (machineId === null) {
+      setSelectedMachineId(null);
+    } else {
+      setSelectedMachineId((prev) => (prev === machineId ? null : machineId));
+    }
   }, []);
 
   // ── Derived data ─────────────────────────────────────────────────────────

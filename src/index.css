@@ -30,6 +30,10 @@
   @apply bg-text-secondary;
 }
 
+/* No-scrollbar utility */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* React Flow custom styles */
 .react-flow__pane {
   background-color: transparent !important;

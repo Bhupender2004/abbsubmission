@@ -11,6 +11,7 @@ import {
   Clock,
   Wrench,
   Radio,
+  Settings,
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -273,7 +274,15 @@ function MachineDetail({ machine, alarms }) {
         )}
 
         {role === ROLES.MANAGER && (
-          <button className="w-full py-2 bg-role-accent/10 border border-role-accent/20 text-[10px] text-role-accent rounded font-bold hover:bg-role-accent/20 transition-colors">
+          <button 
+            className="w-full py-2 text-[10px] rounded font-bold transition-colors"
+            style={{ 
+              backgroundColor: 'var(--role-accent-soft)', 
+              borderWidth: '1px',
+              borderColor: 'color-mix(in srgb, var(--role-accent) 30%, transparent)',
+              color: 'var(--role-accent)'
+            }}
+          >
             GENERATE SHIFT REPORT
           </button>
         )}

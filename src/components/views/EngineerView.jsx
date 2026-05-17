@@ -62,8 +62,8 @@ export function EngineerView() {
 
 function ToolButton({ icon: Icon, label }) {
   return (
-    <button className="flex flex-col items-center justify-center p-3 bg-card border border-border rounded-lg hover:border-role-accent transition-colors group">
-      <Icon className="w-5 h-5 text-text-secondary group-hover:text-role-accent mb-2" />
+    <button className="flex flex-col items-center justify-center p-3 bg-card border border-border rounded-lg hover:border-status-selected transition-colors group">
+      <Icon className="w-5 h-5 text-text-secondary group-hover:text-status-selected mb-2" />
       <span className="text-[10px] font-medium text-text-secondary group-hover:text-text-primary">{label}</span>
     </button>
   );

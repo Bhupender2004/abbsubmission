@@ -38,7 +38,8 @@ export function ManagerView() {
                   <motion.div 
                     initial={{ height: 0 }}
                     animate={{ height: `${h}%` }}
-                    className="w-full bg-role-accent/40 rounded-t-sm"
+                    className="w-full rounded-t-sm"
+                    style={{ backgroundColor: 'color-mix(in srgb, var(--role-accent) 40%, transparent)' }}
                   />
                   <span className="text-[10px] text-text-secondary mt-2">{0+i}:00</span>
                 </div>
@@ -80,7 +81,7 @@ export function ManagerView() {
 
 function KPICard({ title, value, trend, icon: Icon, color }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-5 hover:border-role-accent/30 transition-all">
+    <div className="bg-card border border-border rounded-xl p-5 hover:border-[var(--role-accent)]/30 transition-all">
       <div className="flex justify-between items-start mb-4">
         <div className="p-2 bg-background rounded-lg border border-border">
           <Icon className={`w-5 h-5 ${color}`} />
@@ -102,8 +103,8 @@ function ResourceStat({ label, value }) {
         <span className="text-text-secondary">{label}</span>
         <span className="text-text-primary font-semibold">{value}</span>
       </div>
-      <div className="w-full bg-background h-1.5 rounded-full overflow-hidden">
-        <div className="bg-role-accent h-full w-[85%]" />
+        <div className="w-full bg-background h-1.5 rounded-full overflow-hidden">
+          <div className="h-full w-[85%]" style={{ backgroundColor: 'var(--role-accent)' }} />
       </div>
     </div>
   );
